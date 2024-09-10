@@ -1,5 +1,340 @@
 {% layout "template.liquid" %}
 
 {% block content %}
-    <h1>{{ product.title | capitalize }}</h1>
+  <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    
+    html, body {
+        width: 100%;
+        height: 100%;
+    }
+    .product-main{
+        width: 100%;
+    }
+    .product-inner{
+        padding: 10px 30px;
+    }
+    .product-contents{
+        width: 100%;
+        display: flex;
+        gap: 40px;
+        justify-content: center;
+    }
+    .product-image{
+        display: flex;
+        flex-direction: column; 
+        row-gap: 10px;
+    }
+
+    .product-image img{
+        width: 100%;
+        object-fit: cover;
+    }
+    .product-image-nav {
+        display: flex;
+        column-gap: 5px;
+    }
+    .nav-image{
+        min-width: 76px;
+        width: 76px;
+        cursor: pointer;
+    }
+    .nav-image.active{
+        border: 1px solid #000;
+    }
+    .nav-image img{
+        width: 100%;
+        object-fit: cover;
+    }
+    .product-text{
+        display: flex;
+        flex-direction: column;
+        row-gap: 25px;
+        width: 50%;
+    }
+    .product-heading h2{
+        font-size: 35px;
+        font-weight: 600;
+        line-height: 55px;
+    }
+  
+    .addToCart{
+        width: 100%;
+    }
+    .addToCart button{
+        background: #000;
+        color: #fff;
+        outline: none;
+        border: none;
+        max-width: 380px;
+        width: 100%;
+        cursor: pointer;
+        padding: 10px 0;
+        border: 1px solid #000;
+    }
+    .addToCart button:hover{
+        background: #fff;
+        color: #000;
+    }
+    .product-variant{
+        display: flex;
+        gap:5px;
+        flex-wrap: wrap;
+    }
+    .product-variant .variant label{
+        text-transform: capitalize;
+        background-color: #cdcdcd7d;
+        color: #000;
+        padding: 10px;
+        cursor: pointer;
+        border-radius: 3px;
+        min-width: 70px;
+        text-align: center;
+        border: 2px solid transparent;
+        display: block;
+    }
+    .variant.variant_options label:hover {
+        border: 2px solid #000;
+        background-color: #cdcdcdc2;
+    }     
+    .product-quantity{
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        border: 1px solid #000;
+        max-width: 150px;
+        width: 100%;
+    }
+    .product-quantity button{
+        background: #fff;
+        color: #000;
+        border:none;
+        padding: 5px 0;
+        cursor: pointer;
+        width: 100%;
+        font-size: 25px;
+    }
+    .product-quantity .quantity_input{
+        display: inline-flex;
+        font-size: 18px;
+        border: none;
+        text-align: center;
+        width: 70px;
+    }
+    .product-price{
+        display: flex;
+        gap: 8px;
+        align-items: baseline;
+    }
+    .product-price span{
+        display: inline-block;
+    }
+    .product-price .compared-price{
+        font-size: 13px;
+        line-height: 16px;
+    }
+    .product-price .total-price{
+        font-size: 20px;
+        font-weight: 600;
+        line-height: 25px;
+    }
+    @media only screen and (max-width:1024px){
+    .product-inner{
+        padding:10px;
+    }
+
+    }
+    @media only screen and (max-width:768px){
+        .product-contents{
+            gap: 20px;
+        }
+    .nav-image {
+        min-width: 50px;
+    }
+    .nav-image img{
+    width: fit-content;
+    }
+    }
+    @media only screen and (max-width:550px){
+    .product-contents{
+        flex-direction: column;
+    }
+    .addToCart button{
+        max-width: 100%;
+    }
+    .product-text,.product-image{
+        width: 100%;
+    }
+    .product-image img{
+        width: 100%;
+    }
+    }
+    .variant_input {
+    display: none;
+}
+.variant_input:checked+.variant_label {
+    border: 2px solid #000;
+}
+</style>
+<body>
+    <div class="product-main">
+        <div class="product-inner">
+            <div class="product-contents">
+                <div class="product-image">
+                    <div class="product-image-main"> 
+                        <img src="{{product.featured_image}}" alt="" width="" height="">
+                    </div>
+                    <div class="product-image-nav">
+                    {% for image in product.images %}
+                        <div class="nav-image {% if image == product.featured_image %}active{%endif%}">
+                            <img src="{{ image }}" alt="" width="" height="">
+                        </div> 
+                    {% endfor %}
+                    </div>
+                </div>
+                <div class="product-text">
+                    <div class="product-heading">
+                        <h2>{{ product.title }}</h2>
+                    </div>
+                    <div class="product-price">
+                        <span class="compared-price"><s>{{product.variants[0].compare_at_price | money}}</s></span>
+                        <span class="total-price">{{product.variants[0].price | money}}</span>
+                    </div>
+                    <div class="product-variant">
+                    {% for variant in product.variants %}
+                        <div class="variant variant_options">
+                            <input type="radio" name="id" {% unless variant.available %}disabled{% endunless %} class="variant_input" id="variant_{{forloop.index}}" {% if forloop.index == 1 %}checked{% endif %} value="{{variant.id}}" data-price="{{variant.price | money}}" data-compare-price="{{variant.compare_at_price | money}}" />
+                            <label class="variant_label" for="variant_{{forloop.index}}">{{variant.title}}</label>
+                        </div>
+                    {% endfor %}
+                    </div>
+                    <div class="product-quantity">
+                        <button class="minus">-</button>
+                        <input type="number" name="quantity" class="quantity_input" value="1" min="1" max="9999">
+                        <button class="plus">+</button>
+                    </div>
+                    <div class="addToCart">
+                        <button class="add-to-cart">Add to cart</button>
+                    </div>
+                    <div class="product-description">
+                        {{product.description}}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+            document.addEventListener('DOMContentLoaded', function() {
+
+            // Simple image slider
+            const navImages = document.querySelectorAll('.nav-image');
+            navImages.forEach(function(navImage) {
+                navImage.addEventListener('click', function() {
+                    navImages.forEach(function(image) {
+                        image.classList.remove('active');
+                    });
+                    navImage.classList.add('active');
+                    const imgSrc = navImage.querySelector('img').getAttribute('src');
+                    const productImageMain = document.querySelector('.product-image-main img');
+                    if (productImageMain) {
+                        productImageMain.setAttribute('src', imgSrc);
+                    }
+                });
+            });
+
+
+    // Price update functionality
+    const variantInputs = document.querySelectorAll('.variant_input');
+    variantInputs.forEach(function(variantInput) {
+        variantInput.addEventListener('change', function() {
+            const checkedVariant = document.querySelector('.variant_input[name="id"]:checked');
+
+            if (checkedVariant) {
+                const price = checkedVariant.getAttribute('data-price');
+                const comparePrice = checkedVariant.getAttribute('data-compare-price');
+                if (price && document.querySelector('.product-price .total-price')) {
+                    document.querySelector('.product-price .total-price').textContent = price;
+                }
+                if (comparePrice && document.querySelector('.product-price .compared-price')) {
+                    document.querySelector('.product-price .compared-price').textContent = comparePrice;
+                } else if(document.querySelector('.product-price .compared-price')) {
+                    document.querySelector('.product-price .compared-price').textContent = '';
+                }
+            }
+        });
+    });
+
+
+
+                    // quantity plus minus functionality
+                    const quantityButtons = document.querySelectorAll('.product-quantity button');
+
+                    quantityButtons.forEach(function(button) {
+                        button.addEventListener('click', function() {
+                            const input = button.parentElement.querySelector('.quantity_input');
+                            const currentValue = parseInt(input.value);
+                            const minValue = parseInt(input.getAttribute('min'));
+                            const maxValue = parseInt(input.getAttribute('max'));
+
+                            // Check if the button is a minus button or plus button
+
+                            if (button.classList.contains('minus')) {
+                                const newValue = currentValue - 1;
+                                if (newValue >= minValue) {
+                                    input.value = newValue;
+                                }
+                            } else if (button.classList.contains('plus')) {
+                                const newValue = currentValue + 1;
+                                if (newValue <= maxValue) {
+                                    input.value = newValue;
+                                }
+                            }
+                        });
+                    });
+
+
+                    // Add to cart click event
+                    const addToCartButton = document.querySelector('.add-to-cart');
+
+                    addToCartButton.addEventListener('click', function() {
+                        const variantId = document.querySelector('.variant_input[name="id"]:checked').value;
+                        const quantity = document.querySelector('.quantity_input').value;
+                        const formData = {
+                            id: variantId,
+                            quantity: quantity
+                        };
+
+                        // Send the Shopify add to cart AJAX request
+                        fetch('/cart/add.js', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify(formData)
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            console.log('Product added to cart:', data);
+                        })
+                        .catch(error => {
+                            console.error('Error adding product to cart:', error);
+                        });
+                    });
+                    
+        });
+
+    </script>
+</body>
+</html>
 {% endblock %}
